@@ -1,4 +1,4 @@
-TOKEN = "OTc1MzQ3OTY0MjI4ODAwNTIy.GGkBLB.XH1Z9CMeE7e_KbLHXii_lIBGLGOeFr3jH-Dch4"
+TOKEN = "BOT_TOKEN"
 
 mat = ['сука', 'блять', 'хуй', 'педарас', 'пизда', 'говно', 'похуй', 'ебать', 'ебаний', 'дебил', 'педик', 'дурак', 'долбаеб']
 
