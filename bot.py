@@ -282,8 +282,12 @@ async def on_ready():
    #     await bot.change_presence(activity=discord.Streaming(name=random.choice(stream), url='https://www.twitch.tv/rf'))
    #     await sleep(5)
 
-bot.add_cog(Moder(bot))
-bot.add_cog(Help(bot))
-bot.add_cog(Info(bot))
-bot.add_cog(Fun(bot))
+async def setup(bot):
+  await bot.add_cog(Moder(bot))
+  await bot.add_cog(Help(bot))
+  await bot.add_cog(Info(bot))
+  await bot.add_cog(Fun(bot))
+
+asyncio.run(setup(bot))
+
 bot.run(settings['token'])
