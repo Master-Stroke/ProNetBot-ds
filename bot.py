@@ -2,12 +2,14 @@ import discord
 from discord.ext import commands
 from asyncio import sleep
 import random
+import asyncio
 
 from config import settings
 from systemFiles.helpCommands import Help
 from systemFiles.moderation import Moder
 from systemFiles.info import Info
 from systemFiles.fun import Fun
+from systemFiles.music import Music
 from discord import utils
 from discord import Status, Game
 
@@ -18,10 +20,20 @@ bot.remove_command('help')
 prefix = settings['prefix']
 
 @bot.event
-async def on_member_join(member: discord.Member):
+async def on_guild_join(guild):
+    embed = discord.Embed(title=f'Привет!', description=f"Я мультифункциональный бот-модератор для IT серверов дискорда!\nЧто бы узнать мои команды напиши `!help`\n\n**Сервер поддержки:**\n[Тут](https://discord.com/invite/yVSSf8B9m8) сервер поддержки бота!")
+    await guild.system_channel.send(embed=embed)
+
+@bot.event
+async def on_member_join(member: discord.member):
+  # member = discord.member
+   if member.guild.id == 975057574326050946: 
     channel = bot.get_channel(1008101806624215121)
     embed = discord.Embed(title=f'У нас новенькие!', description=f'Пользователь {member.mention} Присоеденился к серверу!\n\nПривет {member.mention}, Добро пожаловать на сервер Сообщесто Программистов\nВ етом сервере ти можеж общаться с программистами\nТакже выбери роль на канале Роли\nТакже мы есть в телеграме\nКанал https://t.me/official_programmerchannel\nЧат https://t.me/official_programmerchat\nПожалуста прочитай правила сервера !rules\nПомощь по боту: !help', color=0xFAA200)
     await channel.send(embed=embed)
+   else:
+    embed = discord.Embed(title=f'Приведствую тебя на сервере!', description=f'Пользователь {member.mention} Присоеденился к серверу!', color=0xFAA200)
+    await member.guild.system_channel.send(embed=embed)
 
 POST_ID = 1008429787284516935
 
@@ -85,11 +97,21 @@ SROL = {
     '🦾': 1015400565255180421 # Подписка: Статус бота
 }
 
-@commands.Cog.listener()
-async def on_member_join(self, member):
-     channel = bot.get_channel(1008101806624215121)
-     embed = discord.Embed(title=f'У нас новенькие!', description=f'Пользователь {member.mention} Присоеденился к серверу!\n\nПривет {member.mention}, Добро пожаловать на сервер Сообщесто Программистов\nВ етом сервере ти можеж общаться с программистами\nТакже выбери роль на канале Роли\nТакже мы есть в телеграме\nКанал https://t.me/official_programmerchannel\nЧат https://t.me/official_programmerchat\nПожалуста прочитай правила сервера !rules\nКоманди бота !commands', color=0xFAA200)
-     await channel.send(embed=embed)
+#@commands.Cog.listener()
+#async def on_member_join(self, member):
+#     channel = bot.get_channel(1008101806624215121)
+#     embed = discord.Embed(title=f'У нас новенькие!', description=f'Пользователь {member.mention} Присоеденился к серверу!\n\nПривет #{member.mention}, Добро пожаловать на сервер Сообщесто Программистов\nВ етом сервере ти можеж общаться с программистами\nТакже выбери роль на #канале Роли\nТакже мы есть в телеграме\nКанал https://t.me/official_programmerchannel\nЧат https://t.me/official_programmerchat\nПожалуста #прочитай правила сервера !rules\nКоманди бота !commands', color=0xFAA200)
+   #  await channel.send(embed=embed)
+     
+@bot.event
+async def on_member_remove(member: discord.Member):
+  if member.guild.id == 975057574326050946: 
+     channel = bot.get_channel(1040746337626501130)
+     embed = discord.Embed(title=f'Пока!', description=f'Пользователь {member.mention} вышел с сервера.')
+     await channel.send(embed=embed)     
+  else:
+     embed = discord.Embed(title=f'Пока!', description=f'Пользователь {member.mention} вышел с сервера.')
+     await member.guild.system_channel.send(embed=embed)   
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -287,6 +309,7 @@ async def setup(bot):
   await bot.add_cog(Help(bot))
   await bot.add_cog(Info(bot))
   await bot.add_cog(Fun(bot))
+  await bot.add_cog(Music(bot))
 
 asyncio.run(setup(bot))
 
