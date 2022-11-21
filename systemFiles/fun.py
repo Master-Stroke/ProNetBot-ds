@@ -7,6 +7,17 @@ from discord.ext import commands
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        
+    @commands.command(aliases=["8ball"])
+    async def eightball(self, ctx, *, question: commands.clean_content):
+        """ Consult 8ball to receive an answer """
+        ballresponse = [
+            "Да", "Нет", "хмм...", "Очень сомнительно",
+            "Конечно", "Без сомнения", "Возможно",
+            "Ты думай", "не... (╯°□°）╯︵ ┻━┻" ]
+
+        answer = random.choice(ballresponse)
+        await ctx.send(f"🎱 **Вопрос:** {question}\n**Ответ:** {answer}")
 
     # Подбросить монетку
     @commands.command()
@@ -59,11 +70,3 @@ class Fun(commands.Cog):
   #      await ctx.send(embed=emb)
 
     # Ping - pong
-
-    @commands.command()
-    async def ping(self, ctx: commands.Context) -> None:
-        ping_value = round(self.bot.latency * 1000)
-
-        await ctx.send(
-                f"Пинг: `{ping_value}`ms"
-        )
