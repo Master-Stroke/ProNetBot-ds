@@ -14,23 +14,169 @@ class Help(commands.Cog):
 
         # общий help
         if helpCommand == None or helpCommand == 'help':
-            embed = discord.Embed(
+          if ctx.guild.id == 975057574326050946:
+             embed = discord.Embed(
                 description=f'**Информация о командах:**\n'
                             f'\nВы можете получить детальную справку по каждой команде\n'
                             f'Например: `{prefix}help server`\n'
                             f'\n:bar_chart: Информация\n'
-                            f'`{prefix}help` `{prefix}rules` `{prefix}server` `{prefix}channel` `{prefix}user` `{prefix}roles` `{prefix}bot` `{prefix}ping`'
+                            f'`{prefix}help` `{prefix}server` `{prefix}channel` `{prefix}user` `{prefix}roles` `{prefix}bot` `{prefix}monitoring` `{prefix}ping`'
                             f'\n:toolbox: Модерация\n'
-                            f'`{prefix}ban` `{prefix}kick` `{prefix}clear` `{prefix}slowmode` `{prefix}report`'
+                            f'`{prefix}ban` `{prefix}kick` `{prefix}nick` `{prefix}clear` `{prefix}slowmode`'
+                            f'\n:notes: Музыка\n'
+                            f'`{prefix}join` `{prefix}leave` `{prefix}play` `{prefix}pause` `{prefix}resume` `{prefix}now` `{prefix}remove` `{prefix}skip` `{prefix}volume` `{prefix}queue` `{prefix}stop`'
                             f'\n:dollar: Курс валют\n'
                             f'`{prefix}usd` `{prefix}eur` `{prefix}uah` `{prefix}rub` `{prefix}pln` `{prefix}gbp`'
                             f'\n:joystick: Развлечение\n'
-                            f'`{prefix}coin` `{prefix}howdy` `{prefix}ben`'
+                            f'`{prefix}coin` `{prefix}howdy` `{prefix}ben` `{prefix}8ball`'
+                            f'\n⠀',)
+          else:
+             embed = discord.Embed(
+                description=f'**Информация о командах:**\n'
+                            f'\nВы можете получить детальную справку по каждой команде\n'
+                            f'Например: `{prefix}help server`\n'
+                            f'\n:bar_chart: Информация\n'
+                            f'`{prefix}help` `{prefix}server` `{prefix}channel` `{prefix}user` `{prefix}roles` `{prefix}bot` `{prefix}monitoring` `{prefix}ping`'
+                            f'\n:toolbox: Модерация\n'
+                            f'`{prefix}ban` `{prefix}kick` `{prefix}nick` `{prefix}clear` `{prefix}slowmode`'
+                            f'\n:notes: Музыка\n'
+                            f'`{prefix}join` `{prefix}leave` `{prefix}play` `{prefix}pause` `{prefix}resume` `{prefix}now` `{prefix}remove` `{prefix}skip` `{prefix}volume` `{prefix}queue` `{prefix}stop`'
+                            f'\n:dollar: Курс валют\n'
+                            f'`{prefix}usd` `{prefix}eur` `{prefix}uah` `{prefix}rub` `{prefix}pln` `{prefix}gbp`'
+                            f'\n:joystick: Развлечение\n'
+                            f'`{prefix}coin` `{prefix}howdy` `{prefix}ben` `{prefix}8ball`'
                             f'\n⠀',
+                            
+                color=ctx.author.color)
+          await ctx.send(embed=embed)
+        # помощь раздела информации
+        
+        elif helpCommand == '8ball' or helpCommand == '8ball':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}8ball`:**\n'
+                            f'\nКоманда позволяет получить рандомный ответ то бота\n'
+                            f'\nКоманда приминяется с аргументом:\n'
+                            f'`{prefix}8ball <вопрос>',
                 color=ctx.author.color)
             await ctx.send(embed=embed)
-
-        # помощь раздела информации
+        
+        elif helpCommand == 'monitoring' or helpCommand == 'monitoring':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}monitoring`:**\n'
+                            f'\nКоманда позволяет посмотреть мониторинг бота\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}monitoring',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'stop' or helpCommand == 'stop':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}stop`:**\n'
+                            f'\nКоманда позволяет остановить проигрования музыки\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}stop',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'queue' or helpCommand == 'queue':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}queue`:**\n'
+                            f'\nКоманда позволяет очередь проигрвоания музыки\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}queue',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'volume' or helpCommand == 'volume':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}volume`:**\n'
+                            f'\nКоманда позволяет изменить громкость музыки которая щас играет\n'
+                            f'\nКоманда приминяется с аргументамы:\n'
+                            f'`{prefix}volume <громкость музыки>',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'skip' or helpCommand == 'skip':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}skip`:**\n'
+                            f'\nКоманда позволяет пропустить музыку которая щас играет\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}skip',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'remove' or helpCommand == 'remove':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}remove`:**\n'
+                            f'\nКоманда позволяет убрать музыку с очереди\n'
+                            f'\nКоманда приминяется с аргументамы:\n'
+                            f'`{prefix}remove <номер музыки в очереди>',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'now' or helpCommand == 'now':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}now`:**\n'
+                            f'\nКоманда позволяет посмотреть какая музыка щас играет\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}now',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'resume' or helpCommand == 'resume':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}resume`:**\n'
+                            f'\nКоманда позволяет продолжить воспроизведения музыки\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}resume',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'pause' or helpCommand == 'pause':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}play`:**\n'
+                            f'\nКоманда позволяет поставить на паузу музыку в голосом чате\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}pause`',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'play' or helpCommand == 'play':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}play`:**\n'
+                            f'\nКоманда позволяет включить музыку в голосом чате\n'
+                            f'\nКоманда приминяется с аргументамы:\n'
+                            f'`{prefix}play <ссылка на музыку или названия музыки>`',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'leave' or helpCommand == 'leave':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}leave`:**\n'
+                            f'\nКоманда отключает бота от голосового чата\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}leave`',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'join' or helpCommand == 'join':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}join`:**\n'
+                            f'\nКоманда поделючает бота к голосовому чату\n'
+                            f'\nКоманда приминяется без аргументов:\n'
+                            f'`{prefix}join`',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
+        elif helpCommand == 'nick' or helpCommand == 'nick':
+            embed = discord.Embed(
+                description=f'**Информация о командe `{prefix}nick`:**\n'
+                            f'\nКоманда позволяет изменить ник пользователя на сервере\n'
+                            f'\nКоманда приминяется с аргументом:\n'
+                            f'`{prefix}nick <имя пользователя> <будущий ник>`',
+                color=ctx.author.color)
+            await ctx.send(embed=embed)
+        
         elif helpCommand == 'serverinfo' or helpCommand == 'server':
             embed = discord.Embed(
                 description=f'**Информация о командe `{prefix}serverinfo`:**\n'
@@ -58,15 +204,6 @@ class Help(commands.Cog):
                             f'\nКоманда приминяется без аргументов:\n'
                             f'`{prefix}bot`\n'
                             f'`{prefix}info`',
-                color=ctx.author.color)
-            await ctx.send(embed=embed) 
-
-        elif helpCommand == 'report':
-            embed = discord.Embed(
-                description=f'**Информация о командe `{prefix}report`:**\n'
-                            f'\nКоманда позволяет пожаловаться на пользователя\n'
-                            f'\nКоманда должна бить ответом на сообщенния:\n'
-                            f'`{prefix}report`',
                 color=ctx.author.color)
             await ctx.send(embed=embed) 
 
