@@ -21,16 +21,47 @@ def cpu ():
 class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        
+    @commands.command()
+    async def ping(self, ctx: commands.Context) -> None:
+        ping_value = round(self.bot.latency * 1000)
 
+        await ctx.send(
+                f"Пинг: `{ping_value}`ms"
+        )    
+        
     @commands.command(aliases=['bot', 'info'])
     async def _bot(self, ctx: Context):
       channel = ctx.channel or channel
       emb = discord.Embed(
-            title=f"Информация о боте:",
+            title=f"Привет", description=f"Я мультифункциональный бот-модератор для IT серверов дискорда!\nЧто бы узнать мои команды напиши `!help`\n\n**Сервер поддержки:**\n[Тут](https://discord.com/invite/yVSSf8B9m8) сервер поддержки бота!"
+        )  
+      ping_value = round(self.bot.latency * 1000)
+      servers = len(self.bot.guilds)   
+      commands = len(self.bot.commands)   
+
+      emb.add_field(name=f"Мой пинг: ", value=f"`{ping_value}`ms", inline=False),
+      emb.add_field(name=f"Я работаю на:", value=f"{servers} серверах", inline=False),
+      emb.add_field(name=f"Количество команд: ", value=f"{commands}", inline=False),
+
+      await ctx.send(embed=emb)
+
+    @commands.command(aliases=['monitoring'])
+    async def _monitoring(self, ctx: Context):
+      channel = ctx.channel or channel
+      emb = discord.Embed(
+            title=f"Мониторинг бота",
         )
+        
+      ping_value = round(self.bot.latency * 1000)
+      servers = len(self.bot.guilds)   
+      commands = len(self.bot.commands)   
 
       emb.add_field(name=f"Перезапуск бота бил: ", value=f"{date}", inline=False),
       emb.add_field(name=f"Нагрузка на процессор хостинга: ", value=f"{cpu()}%", inline=False),
+      emb.add_field(name=f"Пинг: ", value=f"`{ping_value}`ms", inline=False),
+      emb.add_field(name=f"Я работаю на:", value=f"{servers} серверах", inline=False),
+      emb.add_field(name=f"Количество команд: ", value=f"{commands}", inline=False),
       emb.add_field(name=f"Количество ядер в системе: ", value=f"{psutil.cpu_count()}", inline=False),
       emb.add_field(name=f"Комп на котором сервер, бил запущен ", value=f"{psutil.boot_time()} секунд назад.", inline=False)
 
