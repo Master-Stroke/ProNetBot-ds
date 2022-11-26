@@ -37,9 +37,12 @@ async def on_guild_join(guild):
 async def on_member_join(member: discord.member):
   # member = discord.member
    if member.guild.id == 975057574326050946: 
-    channel = bot.get_channel(1008101806624215121)
-    embed = discord.Embed(title=f'У нас новенькие!', description=f'Пользователь {member.mention} Присоеденился к серверу!\n\nПривет {member.mention}, Добро пожаловать на сервер Сообщесто Программистов\nВ етом сервере ти можеж общаться с программистами\nТакже выбери роль на канале Роли\nТакже мы есть в телеграме\nКанал https://t.me/official_programmerchannel\nЧат https://t.me/official_programmerchat\nПожалуста прочитай правила сервера !rules\nПомощь по боту: !help', color=0xFAA200)
-    await channel.send(embed=embed)
+    if member.bot:
+        await member.kick(reason="bot")
+    else:
+     channel = bot.get_channel(1008101806624215121)
+     embed = discord.Embed(title=f'У нас новенькие!', description=f'Пользователь {member.mention} Присоеденился к серверу!\n\nПривет {member.mention}, Добро пожаловать на сервер Сообщесто Программистов\nВ етом сервере ти можеж общаться с программистами\nТакже выбери роль на канале Роли\nТакже мы есть в телеграме\nКанал https://t.me/official_programmerchannel\nЧат https://t.me/official_programmerchat\nПожалуста прочитай правила сервера !rules\nПомощь по боту: !help', color=0xFAA200)
+     await channel.send(embed=embed)
    else:
     embed = discord.Embed(title=f'Приведствую тебя на сервере!', description=f'Пользователь {member.mention} Присоеденился к серверу!', color=0xFAA200)
     await member.guild.system_channel.send(embed=embed)
@@ -59,7 +62,7 @@ ROLES = {
     '📒': 1008008432302968865, # json
     '🐘': 1008142636558848081, # php
     '🟣': 1008142723926216744, # charp
-    '🟡': 1008142825071837305, # js
+    '🟡': 1008142825071837305, # js/ts
     '*️⃣': 1008142886178668605, # assembler
     '🍏': 1008142942361370765, # swift
     '🔵': 1008142980332409003, # kotlin
@@ -70,7 +73,7 @@ ROLES = {
 
 EXCROLES = ()
 
-MAX_ROLES_PER_USER = 100000
+MAX_ROLES_PER_USER = 10000000
 
 PRO_ID = 1008493251411579021
 
@@ -106,6 +109,22 @@ SROL = {
     '🦾': 1015400565255180421 # Подписка: Статус бота
 }
 
+CROL = {
+    '🟩': 1044318104517357658, # Зелёный
+    '🟦': 1044318152944787476, # Голубой
+    '🟫': 1044318206040481792, # Коричневый
+    '🟧': 1045123821239287838, # Оранжевый
+    '⬜': 1045124646481174600, # Белый
+    '🟥': 1045124840899756063, # Красный
+    '🟨': 1045124885640384653, # Желтый
+    '🟪': 1045124895396331581, # Сиреневый
+    '⬛': 1045396800418365551, # Чёрный
+}
+
+MAX_CROLL = 10000000
+
+CROL_MSG = 1045399189225492491
+
 #@commands.Cog.listener()
 #async def on_member_join(self, member):
 #     channel = bot.get_channel(1008101806624215121)
@@ -124,7 +143,7 @@ async def on_member_remove(member: discord.Member):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-      if payload.message_id == POST_ID:
+      if payload.message_id == CROL_MSG:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         member = payload.member
@@ -132,9 +151,9 @@ async def on_raw_reaction_add(payload):
 
         try:
             emoji = str(payload.emoji)
-            role = utils.get(message.guild.roles, id=ROLES[emoji])
+            role = utils.get(message.guild.roles, id=CROL[emoji])
 
-            if len([i for i in member.roles if i and i.id not in EXCROLES]) <= MAX_ROLES_PER_USER:
+            if len([i for i in member.roles if i and i.id not in EXCROLES]) <= MAX_CROLL:
                 await member.add_roles(role)
                 print('[SUCCESS] User {0.display_name} has been granted with role {1.name}'.format(member, role))
             else:
@@ -145,7 +164,7 @@ async def on_raw_reaction_add(payload):
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
             print(repr(e))
-      if payload.message_id == PRO_ID:
+      if payload.message_id == POST_ID:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         member = payload.member
@@ -153,7 +172,7 @@ async def on_raw_reaction_add(payload):
 
         try:
             emoji = str(payload.emoji)
-            role = utils.get(message.guild.roles, id=PROGRAMMIST[emoji])
+            role = utils.get(message.guild.roles, id=ROLES[emoji])
 
             if len([i for i in member.roles if i and i.id not in EXCROLES]) <= MAX_ROLES_PER_USER:
                 await member.add_roles(role)
@@ -237,10 +256,10 @@ async def on_raw_reaction_remove(payload):
     user_id = payload.user_id
     member = await (await bot.fetch_guild(payload.guild_id)).fetch_member(payload.user_id)
     print(member, user_id)
-    if payload.message_id == POST_ID:
+    if payload.message_id == CROL_MSG:
         try:
             emoji = str(payload.emoji)
-            role = utils.get(message.guild.roles, id=ROLES[emoji])
+            role = utils.get(message.guild.roles, id=CROL[emoji])
 
             await member.remove_roles(role)
             print('[SUCCESS] Role {1.name} has been remove for user {0.display_name}'.format(member, role))
@@ -313,13 +332,19 @@ async def on_ready():
    #     await bot.change_presence(activity=discord.Streaming(name=random.choice(stream), url='https://www.twitch.tv/rf'))
    #     await sleep(5)
 
-async def setup(bot):
-  await bot.add_cog(Moder(bot))
-  await bot.add_cog(Help(bot))
-  await bot.add_cog(Info(bot))
-  await bot.add_cog(Fun(bot))
-  await bot.add_cog(Music(bot))
+#async def setup(bot):
+#  await bot.add_cog(Moder(bot))
+ # await bot.add_cog(Help(bot))
+ # await bot.add_cog(Info(bot))
+ # await bot.add_cog(Fun(bot))
+ # await bot.add_cog(Music(bot))
 
-asyncio.run(setup(bot))
+bot.add_cog(Moder(bot))
+bot.add_cog(Help(bot))
+bot.add_cog(Info(bot))
+bot.add_cog(Fun(bot))
+bot.add_cog(Music(bot))
+
+#asyncio.run(setup(bot))
 
 bot.run(settings['token'])
