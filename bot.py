@@ -84,7 +84,7 @@ PROGRAMMIST = {
     '🧠': 1008437534432432239, # back-end
     '📱': 1008438497297842329, # ПО-Developer
     '💻': 1008467921263140914, # Web Разработчик
-    '🖼': 1008862515041677432, # Future Developer
+    '💈': 1008862515041677432, # Future Developer
     '🤖': 1008862000056643694, # Bots Developer
     '👶': 1008493418009350164, # Начинающий
     '❌': 1014941080841621545 # Не программист
@@ -143,7 +143,28 @@ async def on_member_remove(member: discord.Member):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-      if payload.message_id == CROL_MSG:
+     if payload.message_id == PRO_ID:
+        channel = bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        member = payload.member
+        print(member)
+
+        try:
+            emoji = str(payload.emoji)
+            role = utils.get(message.guild.roles, id=PROGRAMMIST[emoji])
+
+            if len([i for i in member.roles if i and i.id not in EXCROLES]) <= MAX_ROLES_PER_USER:
+                await member.add_roles(role)
+                print('[SUCCESS] User {0.display_name} has been granted with role {1.name}'.format(member, role))
+            else:
+                await message.remove_reaction(payload.emoji, member)
+                print('[ERROR] Too many roles for user {0.display_name}'.format(member))
+
+        except KeyError as e:
+            print('[ERROR] KeyError, no role found for ' + emoji)
+        except Exception as e:
+            print(repr(e))
+     if payload.message_id == CROL_MSG:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         member = payload.member
@@ -164,7 +185,7 @@ async def on_raw_reaction_add(payload):
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
             print(repr(e))
-      if payload.message_id == POST_ID:
+     if payload.message_id == POST_ID:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         member = payload.member
@@ -185,7 +206,7 @@ async def on_raw_reaction_add(payload):
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
             print(repr(e))
-      if payload.message_id == TESTER_MESSAGE:
+     if payload.message_id == TESTER_MESSAGE:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         member = payload.member
@@ -206,7 +227,7 @@ async def on_raw_reaction_add(payload):
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
             print(repr(e)) 
-      if payload.message_id == VERIFY_ID:
+     if payload.message_id == VERIFY_ID:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         member = payload.member
@@ -227,7 +248,7 @@ async def on_raw_reaction_add(payload):
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
             print(repr(e))                       
-      if payload.message_id == SUBSCRIBE_MESSAGE:
+     if payload.message_id == SUBSCRIBE_MESSAGE:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         member = payload.member
@@ -256,6 +277,19 @@ async def on_raw_reaction_remove(payload):
     user_id = payload.user_id
     member = await (await bot.fetch_guild(payload.guild_id)).fetch_member(payload.user_id)
     print(member, user_id)
+    if payload.message_id == POST_ID:
+        try:
+            emoji = str(payload.emoji)
+            role = utils.get(message.guild.roles, id=ROLES[emoji])
+
+            await member.remove_roles(role)
+            print('[SUCCESS] Role {1.name} has been remove for user {0.display_name}'.format(member, role))
+
+        except KeyError as e:
+            print('[ERROR] KeyError, no role found for ' + emoji)
+
+        except Exception as e:
+            print(repr(e))
     if payload.message_id == CROL_MSG:
         try:
             emoji = str(payload.emoji)
