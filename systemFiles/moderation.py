@@ -1,11 +1,50 @@
 import asyncio
 import discord
+import datetime
 from discord.ext import commands
 
 
 class Moder(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot = bot  
+
+    @commands.command(aliases=["m"])
+    @commands.has_permissions(kick_members=True)
+    async def mute(self, ctx: commands.Context, member: discord.Member, time: int = 1, *, reason: str = None) -> None:
+        role: discord.Role = await commands.RoleConverter().convert(ctx, "Muted")
+        await member.add_roles(role, reason=reason)
+        await add_entry(self.db, COMMANDS["MUTE"].collection, ctx.message.author, member, reason)
+
+        replacement: dict = {"{member}": member.mention, "{time}": time, "{reason}": reason or ""}
+        await ctx.send(embed=CommandEmbed(
+            replace_placeholders(COMMANDS["MUTE"].title, replacement),
+            replace_placeholders(COMMANDS["MUTE"].description, replacement),
+            member,
+        ))
+
+        await asyncio.sleep(time * 60)
+        await member.remove_roles(role)
+        
+    @commands.command(aliases=["nick"])
+    @commands.guild_only()
+    @commands.has_permissions(manage_nicknames=True)
+    async def nickname(self, ctx, member: discord.Member, *, name=None):
+        """ Nicknames a user from the current server. """
+        try:
+            await member.edit(nick=name, reason="need")
+            message = f"Имя **{member.name}'s** поменято на ник **{name}**"
+            if name is None:
+                message = f"Сброс **{member.name}'s** ника"
+            await ctx.send(message)
+        except Exception as e:
+            await ctx.send(e)    
+
+    # Очистка чата
+ #   @commands.command(aliases=['m'])
+   # @commands.has_permissions(ban_members=True)
+ #   async def mute(self, ctx, member: discord.Member = None, tim=None, reason=None):
+    #    time = tim*60
+  #      await member.timeout_for(duration=datetime.timedelta(seconds=time), reason=reason)
 
     # Очистка чата
     @commands.command(aliases=['clear', 'cls'])
@@ -14,7 +53,7 @@ class Moder(commands.Cog):
         if amount == None:
             await ctx.send('Введите количество сообщений для очистки как аргумент')
         else:
-            await ctx.channel.purge(limit=int(amount + 1))
+            await ctx.channel.purge(limit=int(amount))
             channel = self.bot.get_channel(ctx.channel.id)
 
             embed = discord.Embed(
@@ -29,7 +68,7 @@ class Moder(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member = None, reason=None):
+    async def ban(self, ctx, member: discord.Member = None, *, reason=None):
         if member == None:
             await ctx.send('Отметьте участника для бана как аргумент')
         else:
@@ -46,7 +85,7 @@ class Moder(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member = None, reason=None):
+    async def kick(self, ctx, member: discord.Member = None, *, reason=None):
         if member == None:
             await ctx.send('Отметьте участника для изгнания как аргумент')
         else:
@@ -71,23 +110,3 @@ class Moder(commands.Cog):
         else:
             await ctx.channel.edit(slowmode_delay=seconds)
             await ctx.send(f"Задержка в этом канале установленно на {seconds} секунд!")
-
-    # Мьют участников
-'''
-    @commands.command()
-    @commands.has_permissions(manage_roles=True)
-    async def mute(self, ctx, member: discord.Member = None, time=None):
-        if member == None:
-            await ctx.send('Отметьте участника для мьюта как аргумент')
-        else:
-            await ctx.guild.create_role(name="MG-muted", permissions=discord.Permissions(permissions=1024))
-            mute_role = discord.utils.get(ctx.guild.roles, name="MG-muted", can_send_message=false)
-            await member.add_roles(mute_role)
-
-            if time == None:
-                await ctx.send(f"{member.mention} был замьючен!")
-            else:
-                await ctx.send(f"{member.mention} был замьючен на {time} секунд!")
-                await asyncio.sleep(int(time))
-                await member.remove_roles(mute_role)
-'''
