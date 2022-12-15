@@ -12,6 +12,9 @@ from systemFiles.fun import Fun
 from systemFiles.music import Music
 from discord import utils
 from discord import Status, Game
+from discord.ext import commands
+from discord.ui import Button, View
+from discord.ext.commands import Context
 
 intents = discord.Intents.all()
 intents.members = True
@@ -19,14 +22,38 @@ bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
 bot.remove_command('help')
 prefix = settings['prefix']
 
+class MyView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=10)
+        self.ctx = ctx
+
+    @discord.ui.button(label="🗝", style=discord.ButtonStyle.grey, emoji = None)
+    async def button_callback(payload, button, interaction):
+      #  button.label = "Wow!"
+        message = await channel.fetch_message(payload.message_id)
+        member = payload.member
+        role = utils.get(message.guild.roles, id=1050550289394045028)
+        await member.add_roles(role)
+        await interaction.response.send_message("Вы успешно прошли верификацию! Вам открыт доступ к каналам сервера!", ephemeral=True)
+        button.disabled = False
+
+        await interaction.response.edit_message(view=self)
+
+@commands.command(aliases=['vvverify'])
+async def verify(self, ctx: Context):
+    channel = bot.get_channel(payload.channel_id)
+    view = MyView(ctx)
+    embed = discord.Embed(title=f'Верификация на сервере!', description=f'Для прохождения верификации нажмите на кнопку ниже', color=0x3498db)
+    await ctx.send(embed=embed, view=view)
+
 @bot.event
 async def on_guild_join(guild):
     emb = discord.Embed(
             title=f"Привет", description=f"Я мультифункциональный бот-модератор для IT серверов дискорда!\nЧто бы узнать мои команды напиши `!help`\n\n**Сервер поддержки:**\n[Тут](https://discord.com/invite/yVSSf8B9m8) сервер поддержки бота!"
-        )  
+        )
     ping_value = round(self.bot.latency * 1000)
-    servers = len(self.bot.guilds)   
-    commands = len(self.bot.commands)   
+    servers = len(self.bot.guilds)
+    commands = len(self.bot.commands)
 
     emb.add_field(name=f"Мой пинг: ", value=f"`{ping_value}`ms", inline=False),
     emb.add_field(name=f"Я работаю на:", value=f"{servers} серверах", inline=False),
@@ -36,22 +63,22 @@ async def on_guild_join(guild):
 @bot.event
 async def on_member_join(member: discord.member):
   # member = discord.member
-   if member.guild.id == 975057574326050946: 
+   if member.guild.id == 975057574326050946:
     if member.bot:
         await member.kick(reason="bot")
     else:
      channel = bot.get_channel(1008101806624215121)
-     embed = discord.Embed(title=f'У нас новенькие!', description=f'Пользователь {member.mention} Присоеденился к серверу!\n\nПривет {member.mention}, Добро пожаловать на сервер Сообщесто Программистов\nВ етом сервере ти можеж общаться с программистами\nТакже выбери роль на канале Роли\nТакже мы есть в телеграме\nКанал https://t.me/official_programmerchannel\nЧат https://t.me/official_programmerchat\nПожалуста прочитай правила сервера !rules\nПомощь по боту: !help', color=0xFAA200)
-     await channel.send(embed=embed)
+     mbed = discord.Embed(title=f'Приветствую тебя на сервере!', description=f'Пользователь {member.mention} Присоеденился к серверу!', color=0xFAA200)
+     await channel.send(embed=mbed)
    else:
-    embed = discord.Embed(title=f'Приведствую тебя на сервере!', description=f'Пользователь {member.mention} Присоеденился к серверу!', color=0xFAA200)
+    embed = discord.Embed(title=f'Приветствую тебя на сервере!', description=f'Пользователь {member.mention} Присоеденился к серверу!', color=0xFAA200)
     await member.guild.system_channel.send(embed=embed)
 
 POST_ID = 1008429787284516935
 
 ROLES = {
     '🐍': 1008007178793263185, # python
-    '🟦': 1008007612865978408, # vb.net  
+    '🟦': 1008007612865978408, # vb.net
     '🌐': 1008007918613958696, # .net
     '🟠': 1008007981276856320, # html/css
     '🔷': 1008007988172308611, # c/c++
@@ -130,16 +157,16 @@ CROL_MSG = 1045399189225492491
 #     channel = bot.get_channel(1008101806624215121)
 #     embed = discord.Embed(title=f'У нас новенькие!', description=f'Пользователь {member.mention} Присоеденился к серверу!\n\nПривет #{member.mention}, Добро пожаловать на сервер Сообщесто Программистов\nВ етом сервере ти можеж общаться с программистами\nТакже выбери роль на #канале Роли\nТакже мы есть в телеграме\nКанал https://t.me/official_programmerchannel\nЧат https://t.me/official_programmerchat\nПожалуста #прочитай правила сервера !rules\nКоманди бота !commands', color=0xFAA200)
    #  await channel.send(embed=embed)
-     
+
 @bot.event
 async def on_member_remove(member: discord.Member):
-  if member.guild.id == 975057574326050946: 
+  if member.guild.id == 975057574326050946:
      channel = bot.get_channel(1040746337626501130)
      embed = discord.Embed(title=f'Пока!', description=f'Пользователь {member.mention} вышел с сервера.')
-     await channel.send(embed=embed)     
+     await channel.send(embed=embed)
   else:
      embed = discord.Embed(title=f'Пока!', description=f'Пользователь {member.mention} вышел с сервера.')
-     await member.guild.system_channel.send(embed=embed)   
+     await member.guild.system_channel.send(embed=embed)
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -226,7 +253,7 @@ async def on_raw_reaction_add(payload):
         except KeyError as e:
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
-            print(repr(e)) 
+            print(repr(e))
      if payload.message_id == VERIFY_ID:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
@@ -247,7 +274,7 @@ async def on_raw_reaction_add(payload):
         except KeyError as e:
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
-            print(repr(e))                       
+            print(repr(e))
      if payload.message_id == SUBSCRIBE_MESSAGE:
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
@@ -328,8 +355,8 @@ async def on_raw_reaction_remove(payload):
             print('[ERROR] KeyError, no role found for ' + emoji)
 
         except Exception as e:
-            print(repr(e))     
-    if payload.message_id == SUBSCRIBE_MESSAGE: 
+            print(repr(e))
+    if payload.message_id == SUBSCRIBE_MESSAGE:
         try:
             emoji = str(payload.emoji)
             role = utils.get(message.guild.roles, id=SROL[emoji])
@@ -341,13 +368,13 @@ async def on_raw_reaction_remove(payload):
             print('[ERROR] KeyError, no role found for ' + emoji)
 
         except Exception as e:
-            print(repr(e))                                
+            print(repr(e))
 
 # запуск бота
 @bot.event
 async def on_ready():
     print("Готов к труду и обороне")
-    
+
     await bot.change_presence(status=Status.idle, activity=Game(name=f" {prefix}help"))
 
     #await bot.change_presence(status=Status.idle, activity=Game(name=f" {prefix}help"))
