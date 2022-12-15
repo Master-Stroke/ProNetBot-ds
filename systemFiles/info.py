@@ -5,6 +5,15 @@ import requests
 from bs4 import BeautifulSoup as BS
 import datetime
 import psutil
+from discord.ui import Button, View
+from discord import utils
+from config import settings
+
+intents = discord.Intents.all()
+intents.members = True
+bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
+bot.remove_command('help')
+prefix = settings['prefix']
 
 Year = int(datetime.datetime.now().strftime("%Y"))
 Mounth = datetime.datetime.now().strftime("%B")
@@ -18,27 +27,51 @@ def cpu ():
   cpu_per = int (psutil.cpu_percent (1))
   return cpu_per
 
+class MyView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=10)
+        self.ctx = ctx
+
+    @discord.ui.button(label="🗝", style=discord.ButtonStyle.grey, emoji = None)
+    async def button_callback(payload, button, interaction):
+      #  button.label = "Wow!"
+        channel = bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        member = payload.member
+        role = utils.get(message.guild.roles, id=1050550289394045028)
+        await member.add_roles(role)
+        await interaction.response.send_message("Вы успешно прошли верификацию! Вам открыт доступ к каналам сервера!", ephemeral=True)
+        button.disabled = False
+
+        await interaction.response.edit_message(view=self)
+
 class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
+
+    @commands.command(aliases=['vvverify'])
+    async def verify(self, ctx: Context):
+        view = MyView(ctx)
+        embed = discord.Embed(title=f'Верификация на сервере!', description=f'Для прохождения верификации нажмите на кнопку ниже', color=0x3498db)
+        await ctx.send(embed=embed, view=view)
+
     @commands.command()
     async def ping(self, ctx: commands.Context) -> None:
         ping_value = round(self.bot.latency * 1000)
 
         await ctx.send(
                 f"Пинг: `{ping_value}`ms"
-        )    
-        
+        )
+
     @commands.command(aliases=['bot', 'info'])
     async def _bot(self, ctx: Context):
       channel = ctx.channel or channel
       emb = discord.Embed(
             title=f"Привет", description=f"Я мультифункциональный бот-модератор для IT серверов дискорда!\nЧто бы узнать мои команды напиши `!help`\n\n**Сервер поддержки:**\n[Тут](https://discord.com/invite/yVSSf8B9m8) сервер поддержки бота!"
-        )  
+        )
       ping_value = round(self.bot.latency * 1000)
-      servers = len(self.bot.guilds)   
-      commands = len(self.bot.commands)   
+      servers = len(self.bot.guilds)
+      commands = len(self.bot.commands)
 
       emb.add_field(name=f"Мой пинг: ", value=f"`{ping_value}`ms", inline=False),
       emb.add_field(name=f"Я работаю на:", value=f"{servers} серверах", inline=False),
@@ -52,10 +85,10 @@ class Info(commands.Cog):
       emb = discord.Embed(
             title=f"Мониторинг бота",
         )
-        
+
       ping_value = round(self.bot.latency * 1000)
-      servers = len(self.bot.guilds)   
-      commands = len(self.bot.commands)   
+      servers = len(self.bot.guilds)
+      commands = len(self.bot.commands)
 
       emb.add_field(name=f"Перезапуск бота бил: ", value=f"{date}", inline=False),
       emb.add_field(name=f"Нагрузка на процессор хостинга: ", value=f"{cpu()}%", inline=False),
@@ -186,28 +219,28 @@ class Info(commands.Cog):
         url = 'https://www.currency.me.uk/convert/usd/rub'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        rub = soup.find("span", { "class" : "mini ccyrate" }).text 
+        rub = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/usd/eur'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        eur = soup.find("span", { "class" : "mini ccyrate" }).text 
+        eur = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/usd/gbp'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        gbp = soup.find("span", { "class" : "mini ccyrate" }).text 
+        gbp = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/usd/pln'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        pln = soup.find("span", { "class" : "mini ccyrate" }).text    
+        pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
         res = f"USD💵\n🇺🇦{uah}\n🇷🇺{rub}\n🇪🇺{eur}\n🇬🇧{gbp}\n🇵🇱{pln}"
         await message.channel.send(f"{res}")
 
     @commands.command(aliases=['eur', 'euro'])
-    async def _eur(_, message): 
+    async def _eur(_, message):
             url = 'https://www.currency.me.uk/convert/eur/uah'
             r = requests.get(url)
             soup = BS(r.text, 'lxml')
@@ -216,26 +249,26 @@ class Info(commands.Cog):
             url = 'https://www.currency.me.uk/convert/eur/rub'
             r = requests.get(url)
             soup = BS(r.text, 'lxml')
-            rub = soup.find("span", { "class" : "mini ccyrate" }).text 
+            rub = soup.find("span", { "class" : "mini ccyrate" }).text
 
             url = 'https://www.currency.me.uk/convert/eur/usd'
             r = requests.get(url)
             soup = BS(r.text, 'lxml')
-            usd = soup.find("span", { "class" : "mini ccyrate" }).text 
+            usd = soup.find("span", { "class" : "mini ccyrate" }).text
 
             url = 'https://www.currency.me.uk/convert/eur/gbp'
             r = requests.get(url)
             soup = BS(r.text, 'lxml')
-            gbp = soup.find("span", { "class" : "mini ccyrate" }).text 
+            gbp = soup.find("span", { "class" : "mini ccyrate" }).text
 
             url = 'https://www.currency.me.uk/convert/eur/pln'
             r = requests.get(url)
             soup = BS(r.text, 'lxml')
-            pln = soup.find("span", { "class" : "mini ccyrate" }).text 
+            pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
             res = f"EUR💶\n🇺🇦{uah}\n🇷🇺{rub}\n🇺🇸{usd}\n🇬🇧{gbp}\n🇵🇱{pln}"
             await message.channel.send(f"{res}")
-    
+
     @commands.command(aliases=['pln', 'zlota'])
     async def _pln(_, message):
         url = 'https://www.currency.me.uk/convert/pln/usd'
@@ -246,24 +279,24 @@ class Info(commands.Cog):
         url = 'https://www.currency.me.uk/convert/pln/rub'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        rub = soup.find("span", { "class" : "mini ccyrate" }).text 
+        rub = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/pln/eur'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        eur = soup.find("span", { "class" : "mini ccyrate" }).text 
+        eur = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/pln/uah'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        uah = soup.find("span", { "class" : "mini ccyrate" }).text 
+        uah = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/pln/gbp'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        gbp = soup.find("span", { "class" : "mini ccyrate" }).text    
+        gbp = soup.find("span", { "class" : "mini ccyrate" }).text
 
-        res = f"PLN🇵🇱\n🇺🇸{usd}\n🇷🇺{rub}\n🇪🇺{eur}\n🇺🇦{uah}\n🇬🇧{gbp}"  
+        res = f"PLN🇵🇱\n🇺🇸{usd}\n🇷🇺{rub}\n🇪🇺{eur}\n🇺🇦{uah}\n🇬🇧{gbp}"
 
         await message.channel.send(f"{res}")
 
@@ -278,22 +311,22 @@ class Info(commands.Cog):
         url = 'https://www.currency.me.uk/convert/gbp/rub'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        rub = soup.find("span", { "class" : "mini ccyrate" }).text 
+        rub = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/gbp/eur'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        eur = soup.find("span", { "class" : "mini ccyrate" }).text 
+        eur = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/gbp/uah'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        uah = soup.find("span", { "class" : "mini ccyrate" }).text 
+        uah = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/gbp/pln'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        pln = soup.find("span", { "class" : "mini ccyrate" }).text    
+        pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
         res = f"GBP💷\n🇺🇸{usd}\n🇷🇺{rub}\n🇪🇺{eur}\n🇺🇦{uah}\n🇵🇱{pln}"
 
@@ -309,22 +342,22 @@ class Info(commands.Cog):
         url = 'https://www.currency.me.uk/convert/rub/uah'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        uah = soup.find("span", { "class" : "mini ccyrate" }).text 
+        uah = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/rub/eur'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        eur = soup.find("span", { "class" : "mini ccyrate" }).text 
+        eur = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/rub/gbp'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        gbp = soup.find("span", { "class" : "mini ccyrate" }).text 
+        gbp = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/rub/pln'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        pln = soup.find("span", { "class" : "mini ccyrate" }).text    
+        pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
         res = f"RUB🇷🇺\n🇺🇸{usd}\n🇺🇦{uah}\n🇪🇺{eur}\n🇬🇧{gbp}\n🇵🇱{pln}"
 
@@ -340,22 +373,22 @@ class Info(commands.Cog):
         url = 'https://www.currency.me.uk/convert/uah/rub'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        rub = soup.find("span", { "class" : "mini ccyrate" }).text 
+        rub = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/uah/eur'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        eur = soup.find("span", { "class" : "mini ccyrate" }).text 
+        eur = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/uah/gbp'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        gbp = soup.find("span", { "class" : "mini ccyrate" }).text 
+        gbp = soup.find("span", { "class" : "mini ccyrate" }).text
 
         url = 'https://www.currency.me.uk/convert/uah/pln'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
-        pln = soup.find("span", { "class" : "mini ccyrate" }).text    
+        pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
         res = f"UAH🇺🇦\n🇺🇸{usd}\n🇷🇺{rub}\n🇪🇺{eur}\n🇬🇧{gbp}\n🇵🇱{pln}"
 
