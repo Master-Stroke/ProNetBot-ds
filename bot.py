@@ -47,7 +47,7 @@ async def verify(self, ctx: Context):
     await ctx.send(embed=embed, view=view)
 
 @bot.event
-async def on_guild_join(guild):
+async def on_guild_join(self, guild):
     emb = discord.Embed(
             title=f"Привет", description=f"Я мультифункциональный бот-модератор для IT серверов дискорда!\nЧто бы узнать мои команды напиши `!help`\n\n**Сервер поддержки:**\n[Тут](https://discord.com/invite/yVSSf8B9m8) сервер поддержки бота!"
         )
@@ -55,18 +55,32 @@ async def on_guild_join(guild):
     servers = len(self.bot.guilds)
     commands = len(self.bot.commands)
 
-    emb.add_field(name=f"Мой пинг: ", value=f"`{ping_value}`ms", inline=False),
-    emb.add_field(name=f"Я работаю на:", value=f"{servers} серверах", inline=False),
-    emb.add_field(name=f"Количество команд: ", value=f"{commands}", inline=False),
+    emb.add_field(name=f"Мой пинг: ", value=f"`{ping_value}`ms", inline=True),
+    emb.add_field(name=f"Я работаю на:", value=f"{servers} серверах", inline=True),
+    emb.add_field(name=f"Количество команд: ", value=f"{commands}", inline=True),
     await guild.system_channel.send(embed=emb)
 
 @bot.event
 async def on_member_join(member: discord.member):
   # member = discord.member
    if member.guild.id == 975057574326050946:
-    if member.bot:
-        await member.kick(reason="bot")
-    else:
+ #   if member.bot:
+  #      await member.kick(reason="bot")
+   # else:
+     role1 = discord.utils.get(member.guild.roles, id=1053369035192012811)
+     role2 = discord.utils.get(member.guild.roles, id=1053365465575063562)
+     role3 = discord.utils.get(member.guild.roles, id=1053365288139227197)
+     role4 = discord.utils.get(member.guild.roles, id=1053370273715470336)
+     role5 = discord.utils.get(member.guild.roles, id=1053369661347078166)
+     role6 = discord.utils.get(member.guild.roles, id=1053445460376956970)
+     role7 = discord.utils.get(member.guild.roles, id=1053637925880999996)
+     await member.add_roles(role1)
+     await member.add_roles(role2)
+     await member.add_roles(role3)
+     await member.add_roles(role4)
+     await member.add_roles(role5)
+     await member.add_roles(role6)
+     await member.add_roles(role7)
      channel = bot.get_channel(1008101806624215121)
      mbed = discord.Embed(title=f'Приветствую тебя на сервере!', description=f'Пользователь {member.mention} Присоеденился к серверу!', color=0xFAA200)
      await channel.send(embed=mbed)
@@ -133,7 +147,8 @@ SUBSCRIBE_MESSAGE = 1015381998187073577
 
 SROL = {
     '📝': 1015230903074697308, # Подписка: Голосования
-    '🦾': 1015400565255180421 # Подписка: Статус бота
+    '🦾': 1015400565255180421, # Подписка: Статус бота
+    '🎉': 1053635977547100170 # Подписка: Конкурси
 }
 
 CROL = {
@@ -375,7 +390,7 @@ async def on_raw_reaction_remove(payload):
 async def on_ready():
     print("Готов к труду и обороне")
 
-    await bot.change_presence(status=Status.idle, activity=Game(name=f" {prefix}help"))
+    await bot.change_presence(status=Status.idle, activity=Game(name=f"{prefix}help"))
 
     #await bot.change_presence(status=Status.idle, activity=Game(name=f" {prefix}help"))
 
