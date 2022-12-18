@@ -9,6 +9,8 @@ import youtube_dl
 from async_timeout import timeout
 from discord.ext import commands
 
+bot = discord.Bot()
+
 # Silence useless bug reports messages
 youtube_dl.utils.bug_reports_message = lambda: ''
 
@@ -280,11 +282,11 @@ class Music(commands.Cog):
     async def cog_before_invoke(self, ctx: commands.Context):
         ctx.voice_state = self.get_voice_state(ctx)
 
-    async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
-        await ctx.send('Произошла какая-то ошибка: {}'.format(str(error)))
+    async def cog_command_error(self, ctx, error: commands.CommandError):
+        await ctx.respond('Произошла какая-то ошибка: {}'.format(str(error)))
 
-    @commands.command(name='join', invoke_without_subcommand=True)
-    async def _join(self, ctx: commands.Context):
+    @bot.slash_command(name = "join", description = "Подключить бота к голосому каналу")
+    async def _join(self, ctx):
         """Joins a voice channel."""
 
         destination = ctx.author.voice.channel
@@ -293,73 +295,85 @@ class Music(commands.Cog):
             return
 
         ctx.voice_state.voice = await destination.connect()
-        await ctx.message.add_reaction('✅')
+        await ctx.respond('Я успешно подключился к голосовому каналу!')
 
-    @commands.command(name='leave', aliases=['disconnect'])
+    async def _jj(self, ctx):
+        """Joins a voice channel."""
+
+        destination = ctx.author.voice.channel
+        if ctx.voice_state.voice:
+            await ctx.voice_state.voice.move_to(destination)
+            return
+
+        ctx.voice_state.voice = await destination.connect()
+
+    @bot.slash_command(name = "leave", description = "Отключить бота от голосому каналу")
     @commands.has_permissions(manage_guild=True)
-    async def _leave(self, ctx: commands.Context):
+    async def _leave(self, ctx):
         """Clears the queue and leaves the voice channel."""
 
         if not ctx.voice_state.voice:
-            return await ctx.send('Бот и так не подключен. Зачем его кикать?')
+            return await ctx.respond('Я и так не подключен. Зачем меня кикать?')
 
         await ctx.voice_state.stop()
-        await ctx.message.add_reaction('✅')
+        await ctx.respond('Я успешно вишел с голосового канала!')
         del self.voice_states[ctx.guild.id]
 
-    @commands.command(name='volume')
-    async def _volume(self, ctx: commands.Context, *, volume: int):
+    @bot.slash_command(name = "volume", description = "Подключить бота к голосому каналу")
+    async def _volume(self, ctx, volume: commands.clean_content):
         """Sets the volume of the player."""
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Сейчас музыка не играет. Можете включить.')
+            return await ctx.respond('Сейчас музыка не играет. Можете включить.')
 
         if 0 > volume > 100:
-            return await ctx.send('Volume must be between 0 and 100')
+            return await ctx.respond('Volume must be between 0 and 100')
 
         ctx.voice_state.volume = volume / 100
-        await ctx.send('Громкость изменена на {}%'.format(volume))
-        await ctx.message.add_reaction('✅')
+        await ctx.respond('Громкость изменена на {}%'.format(volume))
 
-    @commands.command(name='now', aliases=['current', 'playing'])
-    async def _now(self, ctx: commands.Context):
+    @bot.slash_command(name = "now", description = "Посмотреть что щас играет")
+    async def _now(self, ctx):
         """Displays the currently playing song."""
 
-        await ctx.send(embed=ctx.voice_state.current.create_embed())
+        await ctx.respond(embed=ctx.voice_state.current.create_embed())
 
-    @commands.command(name='pause')
+    @bot.slash_command(name = "pause", description = "Поставить музыку на паузу")
     @commands.has_permissions(manage_guild=True)
-    async def _pause(self, ctx: commands.Context):
+    async def _pause(self, ctx):
             """Pauses the currently playing song."""
             ctx.voice_state.voice.pause()
-            await ctx.message.add_reaction('⏯')
+            await ctx.respond("Успешно поставил музыку на паузу")
+          #  await ctx.message.add_reaction('⏯')
 
-    @commands.command(name='resume')
+    @bot.slash_command(name = "resume", description = "Продолжить проигрования музыки")
     @commands.has_permissions(manage_guild=True)
-    async def _resume(self, ctx: commands.Context):
+    async def _resume(self, ctx):
             """Resumes a currently paused song."""
             ctx.voice_state.voice.resume()
-            await ctx.message.add_reaction('⏯')
+            await ctx.respond("Успешно продолжил проигрования музыки")
+         #   await ctx.message.add_reaction('⏯')
 
-    @commands.command(name='stop')
+    @bot.slash_command(name = "stop", description = "Остановить музыку")
     @commands.has_permissions(manage_guild=True)
-    async def _stop(self, ctx: commands.Context):
+    async def _stop(self, ctx):
             """Stops playing song and clears the queue."""
             ctx.voice_state.voice.stop()
-            await ctx.message.add_reaction('⏹')
+            await ctx.respond("Успешно остановил проигрования музыки")
+        #    await ctx.message.add_reaction('⏹')
 
-    @commands.command(name='skip')
-    async def _skip(self, ctx: commands.Context):
+    @bot.slash_command(name = "skip", description = "Остановить музыку")
+    async def _skip(self, ctx):
         """Vote to skip a song. The requester can automatically skip.
         3 skip votes are needed for the song to be skipped.
         """
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Сейчас музыка не играет,зачем её пропускать? Можете включить.')
+            return await ctx.resmond('Сейчас музыка не играет,зачем её пропускать? Можете включить.')
 
         voter = ctx.message.author
         if voter == ctx.voice_state.current.requester:
-            await ctx.message.add_reaction('⏭')
+            await ctx.resmond('Успешно пропустил данную музыку!')
             ctx.voice_state.skip()
 
         elif voter.id not in ctx.voice_state.skip_votes:
@@ -367,22 +381,22 @@ class Music(commands.Cog):
             total_votes = len(ctx.voice_state.skip_votes)
 
             if total_votes >= 3:
-                await ctx.message.add_reaction('⏭')
+                await ctx.resmond('Успешно пропустил данную музыку!')
                 ctx.voice_state.skip()
             else:
-                await ctx.send('Голосование за пропуск добавлено. Проголосовали: **{}/3**'.format(total_votes))
+                await ctx.resmond('Голосование за пропуск добавлено. Проголосовали: **{}/3**'.format(total_votes))
 
         else:
-            await ctx.send('Вы уже голосовали за пропуск этого трека.')
+            await ctx.resmond('Вы уже голосовали за пропуск этого трека.')
 
-    @commands.command(name='queue')
-    async def _queue(self, ctx: commands.Context, *, page: int = 1):
+    @bot.slash_command(name = "queue", description = "Очередь музыки")
+    async def _queue(self, ctx, *, page: int = 1):
         """Shows the player's queue.
         You can optionally specify the page to show. Each page contains 10 elements.
         """
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('В очереди нет треков. Можете добавить.')
+            return await ctx.respond('В очереди нет треков. Можете добавить.')
 
         items_per_page = 10
         pages = math.ceil(len(ctx.voice_state.songs) / items_per_page)
@@ -396,26 +410,25 @@ class Music(commands.Cog):
 
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
                  .set_footer(text='Viewing page {}/{}'.format(page, pages)))
-        await ctx.send(embed=embed)
-        
-    @commands.command(name='cq')
-    async def _shuffle(self, ctx: commands.Context):    
-        ctx.voice_state.songs.clear()
-        await ctx.send('Очередь очистена!')
-        await ctx.message.add_reaction('✅')
+        await ctx.responds(embed=embed)
 
-    @commands.command(name='remove')
-    async def _remove(self, ctx: commands.Context, index: int):
+    @bot.slash_command(name = "cq", description = "Очистить очередь музыки")
+    async def _shuffle(self, ctx):
+        ctx.voice_state.songs.clear()
+        await ctx.respond('Очередь очистена!')
+
+    @bot.slash_command(name = "remove", description = "Убрать музыку с очереди")
+    async def _remove(self, ctx, music: int):
         """Removes a song from the queue at a given index."""
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('В очереди нет треков. Можете добавить.')
+            return await ctx.respond('В очереди нет треков. Можете добавить.')
 
-        ctx.voice_state.songs.remove(index - 1)
-        await ctx.message.add_reaction('✅')
+        ctx.voice_state.songs.remove(music - 1)
+        await ctx.respond('Музыка убрана с очереди!')
         
-    @commands.command(name='play')
-    async def _play(self, ctx: commands.Context, *, search: str):
+    @bot.slash_command(name = "play", description = "Проигрование музыки")
+    async def _play(self, ctx, *, search: str):
         """Plays a song.
         If there are songs in the queue, this will be queued until the
         other songs finished playing.
@@ -424,19 +437,18 @@ class Music(commands.Cog):
         """
 
         if not ctx.voice_state.voice:
-            await ctx.invoke(self._join)
+            await ctx.invoke(self._jj)
 
         async with ctx.typing():
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
             except YTDLError as e:
-                await ctx.send('Произошла ошибка при обработке этого запроса: {}'.format(str(e)))
+                await ctx.respond('Произошла ошибка при обработке этого запроса: {}'.format(str(e)))
             else:
+                await ctx.respond("Загрузка! Пожалуста подождите!")
                 song = Song(source)
-
+                await ctx.respond('Успешно добавлено {}'.format(str(source)))
                 await ctx.voice_state.songs.put(song)
-                await ctx.send('Успешно добавлено {}'.format(str(source)))
-                await ctx.message.add_reaction('✅')
 
     @_join.before_invoke
     @_play.before_invoke
