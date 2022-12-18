@@ -15,6 +15,8 @@ bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
 bot.remove_command('help')
 prefix = settings['prefix']
 
+ #: commands.clean_content
+
 Year = int(datetime.datetime.now().strftime("%Y"))
 Mounth = datetime.datetime.now().strftime("%B")
 Dey = int(datetime.datetime.now().strftime("%d"))
@@ -49,22 +51,27 @@ class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(aliases=['testt', 'tttest'])
+    async def _test(self, ctx: Context):
+        servers = self.bot.guilds
+        print(servers)
+
     @commands.command(aliases=['vvverify'])
     async def verify(self, ctx: Context):
         view = MyView(ctx)
         embed = discord.Embed(title=f'Верификация на сервере!', description=f'Для прохождения верификации нажмите на кнопку ниже', color=0x3498db)
         await ctx.send(embed=embed, view=view)
 
-    @commands.command()
-    async def ping(self, ctx: commands.Context) -> None:
+    @bot.slash_command(name = "ping", description = "Пинг бота")
+    async def _ping(self, ctx):
         ping_value = round(self.bot.latency * 1000)
-
-        await ctx.send(
-                f"Пинг: `{ping_value}`ms"
+        emb = discord.Embed(
+            title=f"Пинг: `{ping_value}`ms"
         )
+        await ctx.respond(embed=emb)
 
-    @commands.command(aliases=['bot', 'info'])
-    async def _bot(self, ctx: Context):
+    @bot.slash_command(name = "bot", description = "Информация о боте")
+    async def _bot(self, ctx):
       channel = ctx.channel or channel
       emb = discord.Embed(
             title=f"Привет", description=f"Я мультифункциональный бот-модератор для IT серверов дискорда!\nЧто бы узнать мои команды напиши `!help`\n\n**Сервер поддержки:**\n[Тут](https://discord.com/invite/yVSSf8B9m8) сервер поддержки бота!"
@@ -77,10 +84,10 @@ class Info(commands.Cog):
       emb.add_field(name=f"Я работаю на:", value=f"{servers} серверах", inline=False),
       emb.add_field(name=f"Количество команд: ", value=f"{commands}", inline=False),
 
-      await ctx.send(embed=emb)
+      await ctx.respond(embed=emb)
 
-    @commands.command(aliases=['monitoring'])
-    async def _monitoring(self, ctx: Context):
+    @bot.slash_command(name = "monitoring", description = "Мониторинг бота")
+    async def _monitoring(self, ctxt):
       channel = ctx.channel or channel
       emb = discord.Embed(
             title=f"Мониторинг бота",
@@ -98,11 +105,11 @@ class Info(commands.Cog):
       emb.add_field(name=f"Количество ядер в системе: ", value=f"{psutil.cpu_count()}", inline=False),
       emb.add_field(name=f"Комп на котором сервер, бил запущен ", value=f"{psutil.boot_time()} секунд назад.", inline=False)
 
-      await ctx.send(embed=emb)
+      await ctx.respond(embed=emb)
 
     # Информация о сервере
-    @commands.command(aliases=['serverinfo', 'server'])
-    async def stats(self, ctx: Context):
+    @bot.slash_command(name = "server", description = "Информация о сервере")
+    async def stats(self, ctx):
      name = str(ctx.guild.name)
      description = str(ctx.guild.description)
      owner = str(ctx.guild.owner)
@@ -126,67 +133,18 @@ class Info(commands.Cog):
      emb.add_field(name='Дата создания:', value=f'{ctx.guild.created_at.strftime("%Y.%m.%d, %H:%M")}', inline=False)
      emb.add_field(name='Количество каналов:', value=f'> Текстовых: {tchcount}\n> Голосовых: {vchcount}\n> Категорий: {cchcount}',
                   inline=False)
-     await ctx.send(embed=emb)
+     await ctx.respond(embed=emb)
 
-    @commands.command(aliases=['channelinfo', 'channel'])
-    async def channelstats(self, ctx, channel: discord.TextChannel = None):
+    @bot.slash_command(name = "userinfo", description = "Информация о пользователе")
+    async def _userinfo(self, ctx, member: discord.Member = None):
+      if member == None:
+            embed = discord.Embed(
+                description=f"**Отметьте участника для просмотра его информации как аргумент!**",
+                colour=0xe74c3c,
+            )
 
-        channel = ctx.channel or channel
-        embed = discord.Embed(
-            title=f"Информация о канале `{channel.name}`",
-            description=f"{'Катеригория: `{}'.format(channel.category.name) if channel.category else 'У этого канала нету катеригории!`'}`",
-            colour=0xBF8040,
-        )
-
-        if channel.slowmode_delay == 0:
-            slow_mode = "Отключен"
-
-        fields = [
-            ("Названия канала", ctx.guild.name, False),
-            ("ID канала", channel.id, False),
-            ("Позиция канала в списке", channel.position, False),
-            ("Медленый режим", slow_mode, False),
-            ("Когда был создан канал", channel.created_at, False),
-        ]
-        for name, value, inline in fields:
-            embed.add_field(name=name, value=value, inline=inline)
-
-        await ctx.send(embed=embed)
-
-
-    # Информация о ролях пользователя
-
-    @commands.command(aliases=['myroles', 'roles'])
-    async def _roles(self, ctx, member: discord.Member = None, guild: discord.Guild = None):
-        if member == None:
-            userPrefix = ctx.message.author
-        else:
-            userPrefix = member
-
-        member_roles = userPrefix.roles
-        member_roles.pop(0)
-        member_roles.reverse()
-        x = ''
-        for i in member_roles:
-            element = str(i.id)
-            result = f'<@&{element}>'
-            if len(member_roles) <= 5:
-                x += f'{result}\n'
-            else:
-                x += f'- {result} -'
-
-        embed = discord.Embed(
-            description=f"{userPrefix.mention} список ролей:\n\n{x}",
-            color=ctx.author.color, )
-        await ctx.send(embed=embed)
-
-    # Информация о пользователя
-
-    @commands.command(aliases=['user', 'userinfo'])
-    async def _userinfo(self, ctx, member: discord.Member = None, guild: discord.Guild = None):
-        if not member:
-            member = ctx.message.author
-
+            await ctx.respond(embed=embed)
+      else:
         t = member.status
         if t == discord.Status.online:
             d = ":green_circle: В сети"
@@ -203,14 +161,73 @@ class Info(commands.Cog):
             description=f'**Информация о пользователе**\n'
                         f'\n**Имя: **{member.display_name}\n'
                         f'**Статус: **{d}\n'
-                        f'**Роль на сервере: **{member.top_role.mention}\n'
+                    #    f'**Роль на сервере: **{member.top_role.mention}\n'
                         f'**Дата создания: **{member.created_at.strftime("%d.%m.%Y")}\n',
             color=ctx.author.color, )
         embed.set_footer(text=f'ID: {member.id}')
-        await ctx.send(embed=embed)
+        await ctx.respond(embed=embed)
 
-    @commands.command(aliases=['usd', 'dollar'])
-    async def _usd(_, message):
+    @bot.slash_command(name = "channel", description = "Информация о канале")
+    async def channelstats(self, ctx, channel: discord.TextChannel = None):
+        if channel == None:
+            channel = ctx.channel
+        else:
+            channel = channel
+        embed = discord.Embed(
+            title=f"Информация о канале `{channel.name}`",
+            description=f"{'Катеригория: `{}'.format(channel.category.name) if channel.category else 'У этого канала нету катеригории!`'}`",
+            colour=0x979c9f
+        )
+
+        if channel.slowmode_delay == 0:
+            slow_mode = "Отключен"
+
+        fields = [
+            ("Названия канала", channel.name, False),
+            ("ID канала", channel.id, False),
+            ("Позиция канала в списке", channel.position, False),
+            ("Медленый режим", slow_mode, False),
+            ("Когда был создан канал", channel.created_at, False),
+        ]
+        for name, value, inline in fields:
+            embed.add_field(name=name, value=value, inline=inline)
+
+        await ctx.respond(embed=embed)
+
+
+    # Информация о ролях пользователя
+
+    @bot.slash_command(name = "roles", description = "Роли")
+    async def _roles(self, ctx, member: discord.Member = None):
+      if member == None:
+            embed = discord.Embed(
+                description=f"**Отметьте участника для просмотра ролей как аргумент!**",
+                colour=0xe74c3c,
+            )
+
+            await ctx.respond(embed=embed)
+      else:
+            userPrefix = member
+
+            member_roles = userPrefix.roles
+            member_roles.pop(0)
+            member_roles.reverse()
+            x = ''
+            for i in member_roles:
+              element = str(i.id)
+              result = f'<@&{element}>'
+              if len(member_roles) <= 5:
+                x += f'{result}\n'
+              else:
+                x += f'- {result} -'
+
+            embed = discord.Embed(
+            description=f"{userPrefix.mention} список ролей:\n\n{x}",
+            color=ctx.author.color)
+            await ctx.respond(embed=embed)
+
+    @bot.slash_command(name = "usd", description = "Курс доллара")
+    async def _usd(self, ctx):
         url = 'https://www.currency.me.uk/convert/usd/uah'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
@@ -236,11 +253,14 @@ class Info(commands.Cog):
         soup = BS(r.text, 'lxml')
         pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
-        res = f"USD💵\n🇺🇦{uah}\n🇷🇺{rub}\n🇪🇺{eur}\n🇬🇧{gbp}\n🇵🇱{pln}"
-        await message.channel.send(f"{res}")
+       # res = f"USD💵\n🇺🇦{uah}\n🇷🇺{rub}\n🇪🇺{eur}\n🇬🇧{gbp}\n🇵🇱{pln}"
+        embed = discord.Embed(title=f"USD 💵",
+        description=f"🇺🇦 {uah}\n🇷🇺 {rub}\n🇪🇺 {eur}\n🇬🇧 {gbp}\n🇵🇱 {pln}",
+        color=0x979c9f)
+        await ctx.respond(embed=embed)
 
-    @commands.command(aliases=['eur', 'euro'])
-    async def _eur(_, message):
+    @bot.slash_command(name = "euro", description = "Курс евро")
+    async def _eur(self, ctx):
             url = 'https://www.currency.me.uk/convert/eur/uah'
             r = requests.get(url)
             soup = BS(r.text, 'lxml')
@@ -266,11 +286,13 @@ class Info(commands.Cog):
             soup = BS(r.text, 'lxml')
             pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
-            res = f"EUR💶\n🇺🇦{uah}\n🇷🇺{rub}\n🇺🇸{usd}\n🇬🇧{gbp}\n🇵🇱{pln}"
-            await message.channel.send(f"{res}")
+            embed = discord.Embed(title=f"EUR 💶",
+            description=f"🇺🇦 {uah}\n🇷🇺 {rub}\n🇺🇸 {usd}\n🇬🇧 {gbp}\n🇵🇱 {pln}",
+            color=0x979c9f)
+            await ctx.respond(embed=embed)
 
-    @commands.command(aliases=['pln', 'zlota'])
-    async def _pln(_, message):
+    @bot.slash_command(name = "pln", description = "Курс злотих")
+    async def _pln(self, ctx):
         url = 'https://www.currency.me.uk/convert/pln/usd'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
@@ -296,13 +318,13 @@ class Info(commands.Cog):
         soup = BS(r.text, 'lxml')
         gbp = soup.find("span", { "class" : "mini ccyrate" }).text
 
-        res = f"PLN🇵🇱\n🇺🇸{usd}\n🇷🇺{rub}\n🇪🇺{eur}\n🇺🇦{uah}\n🇬🇧{gbp}"
+        embed = discord.Embed(title=f"PLN 🇵🇱",
+        description=f"🇺🇸 {usd}\n🇷🇺 {rub}\n🇪🇺 {eur}\n🇺🇦 {uah}\n🇬🇧 {gbp}",
+        color=0x979c9f)
+        await ctx.respond(embed=embed)
 
-        await message.channel.send(f"{res}")
-
-
-    @commands.command(aliases=['gbp', 'pound'])
-    async def _gbp(_, message):
+    @bot.slash_command(name = "gbp", description = "Курс фунта")
+    async def _gbp(self, ctx):
         url = 'https://www.currency.me.uk/convert/gbp/usd'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
@@ -328,12 +350,13 @@ class Info(commands.Cog):
         soup = BS(r.text, 'lxml')
         pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
-        res = f"GBP💷\n🇺🇸{usd}\n🇷🇺{rub}\n🇪🇺{eur}\n🇺🇦{uah}\n🇵🇱{pln}"
+        embed = discord.Embed(title=f"GBP 💷",
+        description=f"🇺🇸 {usd}\n🇷🇺 {rub}\n🇪🇺 {eur}\n🇺🇦 {uah}\n🇵🇱 {pln}",
+        color=0x979c9f)
+        await ctx.respond(embed=embed)
 
-        await message.channel.send(f"{res}")
-
-    @commands.command(aliases=['rub', 'rouble'])
-    async def _rub(_, message):
+    @bot.slash_command(name = "rub", description = "Курс рубля")
+    async def _rub(self, ctx):
         url = 'https://www.currency.me.uk/convert/rub/usd'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
@@ -359,12 +382,13 @@ class Info(commands.Cog):
         soup = BS(r.text, 'lxml')
         pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
-        res = f"RUB🇷🇺\n🇺🇸{usd}\n🇺🇦{uah}\n🇪🇺{eur}\n🇬🇧{gbp}\n🇵🇱{pln}"
+        embed = discord.Embed(title=f"RUB 🇷🇺",
+        description=f"🇺🇸 {usd}\n🇺🇦 {uah}\n🇪🇺 {eur}\n🇬🇧 {gbp}\n🇵🇱 {pln}",
+        color=0x979c9f)
+        await ctx.respond(embed=embed)
 
-        await message.channel.send(f"{res}")
-
-    @commands.command(aliases=['uah', 'hryvnia'])
-    async def _uah(_, message):
+    @bot.slash_command(name = "uah", description = "Курс гривни")
+    async def _uah(self, ctx):
         url = 'https://www.currency.me.uk/convert/uah/usd'
         r = requests.get(url)
         soup = BS(r.text, 'lxml')
@@ -390,9 +414,10 @@ class Info(commands.Cog):
         soup = BS(r.text, 'lxml')
         pln = soup.find("span", { "class" : "mini ccyrate" }).text
 
-        res = f"UAH🇺🇦\n🇺🇸{usd}\n🇷🇺{rub}\n🇪🇺{eur}\n🇬🇧{gbp}\n🇵🇱{pln}"
-
-        await message.channel.send(f"{res}")
+        embed = discord.Embed(title=f"UAH 🇺🇦",
+        description=f"🇺🇸 {usd}\n🇷🇺 {rub}\n🇪🇺 {eur}\n🇬🇧 {gbp}\n🇵🇱{pln}",
+        color=0x979c9f)
+        await ctx.respond(embed=embed)
 
     # Аватарка пользователя
 '''
