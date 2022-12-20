@@ -390,9 +390,11 @@ async def on_raw_reaction_remove(payload):
 async def on_ready():
     print("Готов к труду и обороне")
 
-    await bot.change_presence(status=Status.idle, activity=Game(name=f"{prefix}help"))
+    servers = len(bot.guilds)
 
-    #await bot.change_presence(status=Status.idle, activity=Game(name=f" {prefix}help"))
+   # await bot.change_presence(status=Status.idle, activity=Game(name=f"{prefix}help"))
+  #  await bot.change_presence(activity=discord.Streaming(name=f"{prefix}help", url='https://www.twitch.tv/rf'))
+    await bot.change_presence(status=Status.idle, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{prefix}help на {servers} серверах"))
 
    # watch = ['Хауди Хо', 'Гошу Дударя', 'Фсоки', 'UnderMind', 'мемы', '!help']
   #  listen = ['музыку', 'радио', '!help']
